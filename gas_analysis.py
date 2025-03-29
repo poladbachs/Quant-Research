@@ -1,46 +1,59 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 df = pd.read_csv("Nat_Gas.csv")
 df.rename(columns={"Dates": "Date", "Prices": "Price"}, inplace=True)
 df['Date'] = pd.to_datetime(df['Date'])
 df = df.sort_values(by='Date')
 
-plt.figure(figsize=(10, 5))
-plt.plot(df['Date'], df['Price'], marker='o')
-plt.title("Natural Gas Prices (Monthly Snapshot)")
-plt.xlabel("Date")
-plt.ylabel("Price (USD)")
-plt.grid(True)
-plt.tight_layout()
-plt.show()
+start_date = date(2020, 10, 31)
+end_date = date(2024, 9, 30)
+months = []
+year = start_date.year
+month = start_date.month + 1
+while True:
+    current = date(year, month, 1) + timedelta(days=-1)
+    months.append(current)
+    if current.month == end_date.month and current.year == end_date.year:
+        break
+    else:
+        month = ((month + 1) % 12) or 12
+        if month == 1:
+            year += 1
 
-df['Timestamp'] = df['Date'].map(datetime.toordinal)
-X = df['Timestamp'].values.reshape(-1, 1)
-y = df['Price'].values
+days_from_start = [(day - start_date).days for day in months]
+prices = df['Price'].values
+time = np.array(days_from_start)
 
-model = LinearRegression()
-model.fit(X, y)
+xbar = np.mean(time)
+ybar = np.mean(prices)
+slope = np.sum((time - xbar) * (prices - ybar)) / np.sum((time - xbar) ** 2)
+intercept = ybar - slope * xbar
+
+sin_prices = prices - (time * slope + intercept)
+sin_time = np.sin(time * 2 * np.pi / 365)
+cos_time = np.cos(time * 2 * np.pi / 365)
+slope1 = np.sum(sin_prices * sin_time) / np.sum(sin_time ** 2)
+slope2 = np.sum(sin_prices * cos_time) / np.sum(cos_time ** 2)
+
+amplitude = np.sqrt(slope1 ** 2 + slope2 ** 2)
+shift = np.arctan2(slope2, slope1)
 
 def estimate_price(date_str):
-    date = datetime.strptime(date_str, "%Y-%m-%d")
-    timestamp = np.array([[date.toordinal()]])
-    price = model.predict(timestamp)[0]
-    return round(price, 4)
+    d = pd.to_datetime(date_str).date()
+    days = (d - start_date).days
+    return round(amplitude * np.sin(days * 2 * np.pi / 365 + shift) + days * slope + intercept, 4)
 
 future_dates = pd.date_range(start=df['Date'].max() + pd.offsets.MonthEnd(1), periods=12, freq='M')
-future_timestamps = future_dates.map(datetime.toordinal).values.reshape(-1, 1)
-future_prices = model.predict(future_timestamps)
+future_days = [(d.date() - start_date).days for d in future_dates]
+future_prices = [estimate_price(str(d.date())) for d in future_dates]
 
 extrapolated_df = pd.DataFrame({
     'Date': future_dates,
-    'Estimated_Price': np.round(future_prices, 4)
+    'Estimated_Price': future_prices
 })
 
-print("Extrapolated Natural Gas Prices (Next 12 Months):")
 print(extrapolated_df)
-
 print("Estimated price on 2025-04-15:", estimate_price("2025-04-15"))
