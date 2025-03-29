@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from datetime import datetime, date, timedelta
+from datetime import date, timedelta
 
 df = pd.read_csv("Nat_Gas.csv")
 df.rename(columns={"Dates": "Date", "Prices": "Price"}, inplace=True)
@@ -54,6 +54,16 @@ extrapolated_df = pd.DataFrame({
     'Date': future_dates,
     'Estimated_Price': future_prices
 })
+
+plt.figure(figsize=(10, 5))
+plt.plot(extrapolated_df['Date'], extrapolated_df['Estimated_Price'], marker='o', color='orange')
+plt.title("Extrapolated Natural Gas Prices (With Seasonality)")
+plt.xlabel("Date")
+plt.ylabel("Estimated Price (USD)")
+plt.grid(True)
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
 
 print(extrapolated_df)
 print("Estimated price on 2025-04-15:", estimate_price("2025-04-15"))
