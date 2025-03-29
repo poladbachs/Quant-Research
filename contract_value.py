@@ -41,7 +41,8 @@ def average_price_over_period(start_date_str, duration_days):
 
 def price_storage_contract(injection_dates, withdrawal_dates, volume_mmbtu,
                              injection_rate_mmbtu_per_day, withdrawal_rate_mmbtu_per_day,
-                             max_storage_volume_mmbtu, storage_cost_per_month):
+                             max_storage_volume_mmbtu, storage_cost_per_month,
+                             injection_withdrawal_cost_rate):
     assert len(injection_dates) == len(withdrawal_dates), "Mismatched injection/withdrawal dates"
     assert volume_mmbtu <= max_storage_volume_mmbtu, "Exceeds max storage capacity"
     total_revenue = 0
@@ -56,8 +57,18 @@ def price_storage_contract(injection_dates, withdrawal_dates, volume_mmbtu,
         storage_start = inj_dt + timedelta(days=inj_duration)
         storage_duration_days = (wd_dt - storage_start).days
         storage_months = max(storage_duration_days / 30, 1)
+
+        injection_cost = injection_withdrawal_cost_rate * volume_mmbtu
+        withdrawal_cost = injection_withdrawal_cost_rate * volume_mmbtu
+
         revenue = avg_sell_price * volume_mmbtu
-        cost = avg_buy_price * volume_mmbtu + storage_cost_per_month * storage_months
+        cost = (
+            avg_buy_price * volume_mmbtu +
+            storage_cost_per_month * storage_months +
+            injection_cost +
+            withdrawal_cost
+        )
+
         total_revenue += revenue
         total_cost += cost
     return round(total_revenue - total_cost, 2)
@@ -73,6 +84,7 @@ if __name__ == "__main__":
         injection_rate_mmbtu_per_day=50_000,
         withdrawal_rate_mmbtu_per_day=50_000,
         max_storage_volume_mmbtu=2_000_000,
-        storage_cost_per_month=100_000
+        storage_cost_per_month=100_000,
+        injection_withdrawal_cost_rate=0.05
     )
     print("Contract Value:", contract_value)
