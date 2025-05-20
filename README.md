@@ -1,7 +1,7 @@
 # JPMorgan's Quantitative Research
 ![Image](https://github.com/user-attachments/assets/f63af4c7-6cc3-4355-949a-26c13eb8eb62)
 
-This project replicates the core responsibilities of a Quantitative Research Analyst by combining predictive modeling, credit risk analytics, and structured financial simulations. Using real-world-style datasets, we forecast commodity prices, quantify risk exposure, and price derivative contracts — all via reproducible and interpretable code.
+This project replicates the core responsibilities of a Quantitative Research Analyst at JPM by combining predictive modeling, credit risk analytics, and structured financial simulations. Using real-world-style datasets, we forecast commodity prices, quantify risk exposure, and price derivative contracts — all via reproducible and interpretable code.
 
 ---
 
