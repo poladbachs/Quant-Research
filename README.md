@@ -48,12 +48,20 @@ This simulation spans four interconnected research components:
 
 To replicate the results:
 
-1. Run each Python file independently:
-   - `gas_analysis.py`: Forecast gas prices + generate plot
-   - `contract_value.py`: Simulate and value storage trades
-   - `fico_mortgage.py`: Map FICO → rating buckets
-   - `loan_loss.py`: Estimate PD and expected losses via Random Forest
+1. Ensure the following input files are in your working directory:
+   - `Nat_Gas.csv` — Monthly natural gas prices
+   - `Task 3 and 4_Loan_Data.csv` — Loan-level mortgage data
 
 2. Install dependencies:
    ```bash
    pip install pandas numpy matplotlib scikit-learn
+   ```
+3. Run each Python file independently:
+   - `gas_analysis.py`: Forecast gas prices + generate plot
+   - `contract_value.py`: Simulate and value storage trades
+   - `fico_mortgage.py`: Map FICO → rating buckets
+   - `loan_loss.py`: Estimate PD and expected losses via Random Forest
+  
+4. Note:  
+   After running `fico_mortgage.py`, the enhanced dataset `Mortgage_Loan_Rating_Mapped.csv` will be generated, containing all borrower data plus a new `rating` column.
+
